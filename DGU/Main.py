@@ -46,7 +46,7 @@ while True:
         xmin, ymin, xmax, ymax = int(data[0]), int(data[1]), int(data[2]), int(data[3])
         class_id = int(data[5])
 
-        if class_id == 0 : #검출한 대상이 사람일 경우만 필터링. 사람 class_id: 0
+        if class_id == 0: #검출한 대상이 사람일 경우만 필터링. 사람 class_id: 0
             results.append([[xmin, ymin, xmax-xmin, ymax-ymin], confidence, class_id])
 
     
