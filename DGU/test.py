@@ -1,8 +1,9 @@
 import cv2
 import time
+import redis
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
-import redis
+from readDB import get_key_offset
 
 CONFIDENCE_THRESHOLD = 0.6
 TIME_THRESHOLD = 7
@@ -10,8 +11,8 @@ VELOCITY_THRESHOLD = 8
 TARGET_MAX = 5
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
+key_offset = get_key_offset()
 
-#model = YOLO('yolov8n.pt')
 model = YOLO('./runs/detect/train/weights/best.pt')
 tracker = DeepSort(max_age=50)
 
@@ -37,6 +38,7 @@ while True:
     #오류 발생 시 20초 후 캠 다시 시작
     if not ret:
         print('Cam Error')
+        key_offset = get_key_offset()
         track_active.clear()
         cap.release()
         cv2.destroyAllWindows()
@@ -101,7 +103,7 @@ while True:
                 distance = abs(current_location - start_location)
                 average_velocity = round(distance / time_interval, 2)
 
-                if average_velocity > VELOCITY_THRESHOLD: redis_client.set(track_id, average_velocity)
+                if average_velocity > VELOCITY_THRESHOLD: redis_client.set(track_id+key_offset, average_velocity)
 
     cv2.imshow('frame', frame)
 
