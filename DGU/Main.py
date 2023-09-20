@@ -6,19 +6,18 @@ CONFIDENCE_THRESHOLD = 0.65  # 신뢰 구간을 정하는 임계값. 참고 코�
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
 
-model = YOLO('yolov8n.pt')
+#model = YOLO('yolov8n.pt')
 model = YOLO('./runs/detect/train/weights/best.pt')
 tracker = DeepSort(max_age=50)
 
 #강남대로
 url = "http://cctvsec.ktict.co.kr/9999/7Hcw88TE2LcuSJfVUaH3av6VVB7e+jnwH4CIG87AqRctrfrPl7Q7R83SZuNsqt9V" # cctv url
 cap = cv2.VideoCapture(url)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
 x1,y1 = 120,300     # cctv 영상 중 원하는 구역만 자르기 frame = frame[y1:y2, x1:x2]
 x2,y2 = 360,420    # 필요한 부분만 잘라 확대하여 리소스 낭비 줄이고 검출에 용이하게 함
-
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
 previous_tracks = {}
 
