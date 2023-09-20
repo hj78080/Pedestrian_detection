@@ -16,13 +16,17 @@ key_offset = get_key_offset()
 model = YOLO('./runs/detect/train/weights/best.pt')
 tracker = DeepSort(max_age=50)
 
-url = "http://cctvsec.ktict.co.kr/9999/7Hcw88TE2LcuSJfVUaH3av6VVB7e+jnwH4CIG87AqRctrfrPl7Q7R83SZuNsqt9V"  # cctv url
+#종로 2가 260, 240 / 540, 370 http://210.179.218.52:1935/live/151.stream/playlist.m3u8
+#~~
+#강남대로 120, 300 / 360, 420 http://cctvsec.ktict.co.kr/9999/7Hcw88TE2LcuSJfVUaH3ajtgPogS1WSjT8EJrzFRBxTowk1/AfBG5rtbj6Ck8sDf
+
+url = ""  # cctv url
 cap = cv2.VideoCapture(url)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-x1, y1 = 120, 300  # cctv 영상 중 원하는 구역만 자르기 frame = frame[y1:y2, x1:x2]
-x2, y2 = 360, 420  # 필요한 부분만 잘라 확대하여 리소스 낭비 줄이고 검출에 용이하게 함
+x1, y1 = 260, 240  # cctv 영상 중 원하는 구역만 자르기 frame = frame[y1:y2, x1:x2]
+x2, y2 = 540, 370  # 필요한 부분만 잘라 확대하여 리소스 낭비 줄이고 검출에 용이하게 함
 
 # Redis 연결 설정
 redis_host = 'localhost'  # Redis 서버 주소
@@ -109,7 +113,6 @@ while True:
 
     if cv2.waitKey(1) == ord('q'):
         break
-
 
 cap.release()
 cv2.destroyAllWindows()

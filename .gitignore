@@ -7,8 +7,10 @@ __pycache__/
 *.so
 
 # Resources
-best.pt
-last.pt
+*.pt
+*.png
+*.jpg
+*.yaml
 
 
 # Distribution / packaging

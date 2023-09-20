@@ -4,7 +4,7 @@ import redis
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 keys = r.keys('*')
 
-# test.py에서 사용, key 값 중 최댓값 반환
+# key 값 중 최댓값 반환
 def get_key_offset() :
     num = 0
     for key in keys:
@@ -17,8 +17,8 @@ def print_values() :
         value = r.get(key)
         print(f'Key: {key.decode("utf-8")}, Value: {value.decode("utf-8")}')
 
+# 전체 삭제
 def flush_DB() :
     r.flushdb()
-
 
 print_values()
