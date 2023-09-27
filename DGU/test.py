@@ -5,28 +5,24 @@ from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 from readDB import get_key_offset
 
-CONFIDENCE_THRESHOLD = 0.6
-TIME_THRESHOLD = 7
-VELOCITY_THRESHOLD = 8
-TARGET_MAX = 5
+CONFIDENCE_THRESHOLD = 0.5
+TIME_THRESHOLD = 5
+VELOCITY_THRESHOLD = 5
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
-key_offset = get_key_offset()
+key_offset = get_key_offset() #key 값 중 최댓값을 구해 target id에 더해 redis에 저장(중복 방지)
 
-model = YOLO('./runs/detect/train/weights/best.pt')
+model = YOLO('yolov8n.pt')
+#model = YOLO('./runs/detect/train/weights/best.pt')
 tracker = DeepSort(max_age=50)
-
-#종로 2가 260, 240 / 540, 370 http://210.179.218.52:1935/live/151.stream/playlist.m3u8
-#~~
-#강남대로 120, 300 / 360, 420 http://cctvsec.ktict.co.kr/9999/7Hcw88TE2LcuSJfVUaH3ajtgPogS1WSjT8EJrzFRBxTowk1/AfBG5rtbj6Ck8sDf
 
 url = ""  # cctv url
 cap = cv2.VideoCapture(url)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-x1, y1 = 260, 240  # cctv 영상 중 원하는 구역만 자르기 frame = frame[y1:y2, x1:x2]
-x2, y2 = 540, 370  # 필요한 부분만 잘라 확대하여 리소스 낭비 줄이고 검출에 용이하게 함
+x1, y1 = 80, 300  # cctv 영상 중 원하는 구역 자르기 frame = frame[y1:y2, x1:x2]
+x2, y2 = 280, 420  # 필요한 부분만 잘라 확대하여 리소스 낭비 줄이고 검출에 용이하게 함
 
 # Redis 연결 설정
 redis_host = 'localhost'  # Redis 서버 주소
@@ -67,7 +63,7 @@ while True:
         xmin, ymin, xmax, ymax = int(data[0]), int(data[1]), int(data[2]), int(data[3])
         class_id = int(data[5])
 
-        if class_id == 0 and len(track_active) < TARGET_MAX:    #최대 타깃 수를 정해 속도 저하 방지
+        if class_id == 0:   #사람일 경우 results에 추가
             results.append([[xmin, ymin, xmax - xmin, ymax - ymin], confidence, class_id])
 
     tracks = tracker.update_tracks(results, frame=frame)
@@ -99,7 +95,7 @@ while True:
             time_interval = time.time() - track_active[track_id][0]
             cv2.putText(frame, f"%.2f" % (time_interval), (xmin + 20, ymin - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, WHITE, 2)
 
-            # 임계값(시간, 속도)이 넘어갈 경우, 적합한 대상이라고 판단하여 구간 속력을 구해 Redis에 저장
+            # 임계값(시간, 속력)이 넘어갈 경우, 적합한 대상이라고 판단하여 구간 속력을 구해 Redis에 저장
             if time_interval >= TIME_THRESHOLD:
                 start_location = track_active[track_id][1]
                 del track_active[track_id]
@@ -107,7 +103,7 @@ while True:
                 distance = abs(current_location - start_location)
                 average_velocity = round(distance / time_interval, 2)
 
-                if average_velocity > VELOCITY_THRESHOLD: redis_client.set(track_id+key_offset, average_velocity)
+                if average_velocity > VELOCITY_THRESHOLD: redis_client.set(int(track_id)+key_offset, average_velocity)
 
     cv2.imshow('frame', frame)
 

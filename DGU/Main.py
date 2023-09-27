@@ -11,7 +11,7 @@ model = YOLO('./runs/detect/train/weights/best.pt')
 tracker = DeepSort(max_age=50)
 
 #강남대로
-url = "http://cctvsec.ktict.co.kr/9999/7Hcw88TE2LcuSJfVUaH3av6VVB7e+jnwH4CIG87AqRctrfrPl7Q7R83SZuNsqt9V" # cctv url
+url = "" # cctv url
 cap = cv2.VideoCapture(url)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
