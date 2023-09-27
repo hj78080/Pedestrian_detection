@@ -12,3 +12,7 @@ Description
 - train.py : Roboflow의 관련 이미지를 이용해 학습
 - Redis : In Memory 방식으로 실시간으로 Id-Speed 값을 저장하기에 적합한 DB
 - YOLOv8n : 실시간으로 영상 정보를 분석하기에 정확성이 비교적 낮더라도 빠른 속도를 보장하는 nano 버전 사용
+
+<p align="center">
+<img src="https://github.com/hj78080/pedestrian_detection/assets/137899379/976b3aa2-64fe-4b8e-aa13-bcea2e1f90aa">
+</p>
